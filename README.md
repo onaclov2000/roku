@@ -1,4 +1,4 @@
 roku
 ====
 
-The roku.js repo doesn't seem to be too happy, I'm putting that data here
+nodejs module to control your roku device, I'm sure it can be improved, but it will do what it needs to at the moment. 
