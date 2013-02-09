@@ -1,0 +1,17 @@
+{
+  "author": "Tyson Bailey <onaclov2000+npm@gmail.com> (blog.onaclovtech.com)",
+  "name": "roku",
+  "description": "Module to control your roku media streaming device",
+  "version": "0.0.1",
+  "homepage": "blog.onaclovtech.com",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/onaclov2000/roku.git"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
