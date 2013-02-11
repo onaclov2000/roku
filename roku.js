@@ -4,16 +4,22 @@
 //       Update to add necessary functions I.E. scroll right 10 seconds, should be Scroll("right",10) or something silly.
 //       I'm sure there is more, also some commands will be dependent on the Roku version, so something to check for that, using
 //       the returned SSDP would be wise.
+
 var http = require('http')
 var dgram = require('dgram'); // dgram is UDP
-var ip = '' 
+var ip = ''
+var port = '' 
+
+
+
 // Listen for responses
 function listen(port) {
-	var server = dgram.createSocket("udp4");
+	var server = dgram.createSocket("udp4");	
  
 	server.on("message", function (msg, rinfo) {
-		console.log("server got: " + msg + " from " + rinfo.address + ":" + rinfo.port);
-                ip = msg;
+                ip = rinfo.address;
+                port = rinfo.port
+                console.log("Address:" + ip + ":" + port);
 	});
 	server.bind(port); // Bind to the random port we were given when sending the message, not 1900
  
@@ -21,11 +27,10 @@ function listen(port) {
 	setTimeout(function(){
 		console.log("Finished waiting");
 		server.close();
-	},20000);
+	},2000);
 }
  
 function search() {
-	
 	var message = new Buffer(
 		"M-SEARCH * HTTP/1.1\r\n" +
 		"Host:239.255.255.250:1900\r\n" +
@@ -43,8 +48,7 @@ function search() {
 }
  
 search();
-
-
+	
 
 var apps = {
   hostname: ip,
@@ -78,21 +82,24 @@ var Keys = {HOME:          '/keypress/Home',
             A:             '/keypress/Lit_a'}
              
 
-/*
-var controller(Key) = {HOME:{
-  hostname: ip,
-  port: 8060,
-  path: '/keypress/Home',
-  method: 'POST'
-},
-PLAY:{
-  hostname: ip,
-  port: 8060,
-  path: Keys[Key],
-  method: 'POST'
-}}
-*/
-
+exports.version = '0.0.1';
+var roku = {play          :callRest(getOptions('PLAY')),
+                           home          :Rest(getOptions('HOME')),
+                           reverse       :Rest(getOptions('REV')),
+                           forward       :Rest(getOptions('FWD')),
+                           select        :Rest(getOptions('SELECT')),
+                           left          :Rest(getOptions('LEFT')),
+                           right         :Rest(getOptions('RIGHT')),
+                           down          :Rest(getOptions('DOWN')),
+                           up            :Rest(getOptions('UP')),
+                           back          :Rest(getOptions('BACK')),
+                           instantreplay :Rest(getOptions('INSTANTREPLAY')),
+                           info          :Rest(getOptions('INFO')),
+                           backspace     :Rest(getOptions('BACKSPACE')),
+                           search        :Rest(getOptions('SEARCH')),
+                           enter         :Rest(getOptions('ENTER'))
+                          }
+module.exports = roku;
 var keyup = {
   hostname: ip,
   port: 8060,
@@ -136,14 +143,23 @@ req.end();
 }
 
 
-function controller(key)
-{
-  Rest({
-   hostname: ip,
-   port: 8060,
-   path: Keys[key],
-   method: 'POST'
-  } )
+
+
+function getOptions(key, callback) {
+    // ...
+
+    // Call the callback
+    callback(key, ip, port);
 }
 
-controller('PLAY');
+function callRest(key, ip, port) {
+    // I'm the callback
+    Rest({
+   hostname: ip,
+   port: port,
+   path: Keys[key],
+   method: 'POST'
+  });
+}
+
+getOptions(getOptions);
