@@ -9,17 +9,20 @@ var http = require('http')
 var dgram = require('dgram'); // dgram is UDP
 var ip = ''
 var port = '' 
-
-
-
+ 
 // Listen for responses
-function listen(port) {
-	var server = dgram.createSocket("udp4");	
+function listen(port, operation) {
+	var server = dgram.createSocket("udp4");
  
 	server.on("message", function (msg, rinfo) {
                 ip = rinfo.address;
-                port = rinfo.port
-                console.log("Address:" + ip + ":" + port);
+		console.log("server got: " + msg + " from " + rinfo.address + ":" + rinfo.port);
+       		console.log("sending " + Keys[operation]);
+                send_message({hostname: ip,
+                              port: 8060,
+                              path: Keys[operation],
+                              method: 'POST'});    
+             
 	});
 	server.bind(port); // Bind to the random port we were given when sending the message, not 1900
  
@@ -27,10 +30,11 @@ function listen(port) {
 	setTimeout(function(){
 		console.log("Finished waiting");
 		server.close();
-	},2000);
+	},20000);
 }
  
-function search() {
+function Search(operation) {
+	console.log(operation);
 	var message = new Buffer(
 		"M-SEARCH * HTTP/1.1\r\n" +
 		"Host:239.255.255.250:1900\r\n" +
@@ -42,12 +46,11 @@ function search() {
  
 	var client = dgram.createSocket("udp4");
 	client.bind(1900, "239.255.255.250"); // So that we get a port so we can listen before sending
-	listen(client.address().port);
+	listen(client.address().port, operation);
 	client.send(message, 0, message.length, 1900, "239.255.255.250", function(err, bytes) {
-  client.close();});
-}
+           client.close();});
+        }
  
-search();
 	
 
 var apps = {
@@ -82,22 +85,21 @@ var Keys = {HOME:          '/keypress/Home',
             A:             '/keypress/Lit_a'}
              
 
-exports.version = '0.0.1';
-var roku = {play          :callRest(getOptions('PLAY')),
-                           home          :Rest(getOptions('HOME')),
-                           reverse       :Rest(getOptions('REV')),
-                           forward       :Rest(getOptions('FWD')),
-                           select        :Rest(getOptions('SELECT')),
-                           left          :Rest(getOptions('LEFT')),
-                           right         :Rest(getOptions('RIGHT')),
-                           down          :Rest(getOptions('DOWN')),
-                           up            :Rest(getOptions('UP')),
-                           back          :Rest(getOptions('BACK')),
-                           instantreplay :Rest(getOptions('INSTANTREPLAY')),
-                           info          :Rest(getOptions('INFO')),
-                           backspace     :Rest(getOptions('BACKSPACE')),
-                           search        :Rest(getOptions('SEARCH')),
-                           enter         :Rest(getOptions('ENTER'))
+var roku = {play          :Search('PLAY'),
+           home          :Search('HOME'),
+           reverse       :Search('REV'),
+           forward       :Search('FWD'),
+           select        :Search('SELECT'),
+           left          :Search('LEFT'),
+           right         :Search('RIGHT'),
+           down          :Search('DOWN'),
+           up            :Search('UP'),
+           back          :Search('BACK'),
+           instantreplay :Search('INSTANTREPLAY'),
+           info          :Search('INFO'),
+           backspace     :Search('BACKSPACE'),
+           search        :Search('SEARCH'),
+           enter         :Search('ENTER')
                           }
 module.exports = roku;
 var keyup = {
@@ -121,45 +123,29 @@ var launchapp = {
   method: 'POST'
 };
 
-function Rest(options)
+var http = require('http')
+
+function send_message(options)
 {
-var req = http.request(options, function(res) {
-  console.log('STATUS: ' + res.statusCode);
-  console.log('HEADERS: ' + JSON.stringify(res.headers));
-  res.setEncoding('utf8');
-  res.on('data', function (chunk) {
-    console.log('BODY: ' + chunk);
-  });
-});
+        console.log(options);
+	var req = http.request(options, function(res) {
+		console.log('STATUS: ' + res.statusCode);
+		console.log('HEADERS: ' + JSON.stringify(res.headers));
+		res.setEncoding('utf8');
+		res.on('data', function (chunk) {
+			console.log('BODY: ' + chunk);
+		});
+	});
 
-req.on('error', function(e) {
-  console.log('problem with request: ' + e.message);
-});
+	req.on('error', function(e) {
+	console.log('problem with request: ' + e.message);
+	});
 
-// write data to request body
-req.write('data\n');
-req.write('data\n');
-req.end();
+	// write data to request body
+	req.write('data\n');
+	req.write('data\n');
+	req.end();
+
 }
 
-
-
-
-function getOptions(key, callback) {
-    // ...
-
-    // Call the callback
-    callback(key, ip, port);
-}
-
-function callRest(key, ip, port) {
-    // I'm the callback
-    Rest({
-   hostname: ip,
-   port: port,
-   path: Keys[key],
-   method: 'POST'
-  });
-}
-
-getOptions(getOptions);
+Search('SELECT');

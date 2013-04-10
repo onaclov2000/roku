@@ -1,2 +1,2 @@
 var roku = require('./roku')
-roku.left;
+roku.select;
