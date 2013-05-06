@@ -85,21 +85,21 @@ var Keys = {HOME:          '/keypress/Home',
             A:             '/keypress/Lit_a'}
              
 
-var roku = {play          :Search('PLAY'),
-           home          :Search('HOME'),
-           reverse       :Search('REV'),
-           forward       :Search('FWD'),
-           select        :Search('SELECT'),
-           left          :Search('LEFT'),
-           right         :Search('RIGHT'),
-           down          :Search('DOWN'),
-           up            :Search('UP'),
-           back          :Search('BACK'),
-           instantreplay :Search('INSTANTREPLAY'),
-           info          :Search('INFO'),
-           backspace     :Search('BACKSPACE'),
-           search        :Search('SEARCH'),
-           enter         :Search('ENTER')
+var roku = {play          :function(){Search('PLAY')},
+           home          :function(){Search('HOME')},
+           reverse       :function(){Search('REV')},
+           forward       :function(){Search('FWD')},
+           select        :function(){Search('SELECT')},
+           left          :function(){Search('LEFT')},
+           right         :function(){Search('RIGHT')},
+           down          :function(){Search('DOWN')},
+           up            :function(){Search('UP')},
+           back          :function(){Search('BACK')},
+           instantreplay :function(){Search('INSTANTREPLAY')},
+           info          :function(){Search('INFO')},
+           backspace     :function(){Search('BACKSPACE')},
+           search        :function(){Search('SEARCH')},
+           enter         :function(){Search('ENTER')}
                           }
 module.exports = roku;
 var keyup = {
@@ -148,4 +148,4 @@ function send_message(options)
 
 }
 
-Search('SELECT');
+//Search('SELECT');
